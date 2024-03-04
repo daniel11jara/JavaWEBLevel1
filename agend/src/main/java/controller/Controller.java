@@ -6,35 +6,60 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import model.DAO;
+import model.JavaBeans;
 
-/**
- * Servlet implementation class Controller
- */
-@WebServlet(urlPatterns = {"/Controller", "/main"})
+
+@WebServlet(urlPatterns = {"/Controller", "/main", "/insert"})
 public class Controller extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
+	
+	
+	DAO dao = new DAO();
+    JavaBeans contato = new JavaBeans();   
+   
     public Controller() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
+	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		//dao.testeConexao();
+		
+		//variavel action vai armazenar o caminho da requisicao
+		String action = request.getServletPath();
+		
+		if (action.equals("/main")) { //o main vem do botao acessar do index.html (página 1)
+			contatos(request, response);//quando clicado vai para o agenda.jsp (página 2)
+		}else if(action.equals("/insert")) {
+			novoContato(request, response);//se o conteudo da variável action for insert vai redirecionar ao método responsável por encaminhar essa requisição a camada model (página 3)
+		}else {
+			response.sendRedirect("index.html");//se não for neunhum dos dois volta para página inicial
+		}
 	}
-
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
+	
+	//listar contatos 
+	protected void contatos(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		response.sendRedirect("agenda.jsp");
+	}
+	
+	//novo contato - método que vai pegar as informações do formulário 
+		protected void novoContato(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+			
+			
+			//setando na classe javabeans onde estão os atributos
+			contato.setNome(request.getParameter("nome"));
+			contato.setFone(request.getParameter("fone"));
+			contato.setEmail(request.getParameter("email"));
+			
+			//chamando o método inserirContato
+			dao.inserirContato(contato);
+			
+			//redirecionar para agenda.jsp
+			response.sendRedirect("main");
+		}
+	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 
